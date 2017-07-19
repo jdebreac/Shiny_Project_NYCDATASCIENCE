@@ -13,7 +13,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 
-Data3 <- read.csv('~/Desktop/NYCDataScience/Bootcamp/Project_Shiny/Data_TP_PD_CO2_AFL_C_Inner.csv',
+Data3 <- read.csv('./Data_TP_PD_CO2_AFL_C_Inner.csv',
                   header=TRUE)
 
 Data_Test <- Data3 %>% group_by(.,Region,IncomeGroup,Year) %>%  
@@ -55,10 +55,10 @@ ui <- fluidPage(
          column(6, plotOutput("AgricultureLandPercentage")),
          column(6, plotOutput("ForestLandPercentage"))),
        fluidRow(
-         column(12, verbatimTextOutput('Nation')),
-         column(12, verbatimTextOutput('Location')),
-         column(12, verbatimTextOutput('Type')),
-         column(12, verbatimTextOutput('World')))
+         column(12, verbatimTextOutput("Nation")),
+         column(12, verbatimTextOutput("Location")),
+         column(12, verbatimTextOutput("Type")),
+         column(12, verbatimTextOutput("World")))
       )
     )
   )
@@ -68,19 +68,25 @@ ui <- fluidPage(
 server <- function(input, output) {
 
   output$Income.GR <- renderUI({
-#    if (length(input$x1)!=0) {
-    Data6 <- Data3 %>%  filter(Region==input$x1)
-    selectizeInput(inputId = "incomeGR", label = "Select Incrome Group", choices = Data6$IncomeGroup)
+    if (length(input$x1)==0) return()
+    else {
+      Data6 <- Data3 %>%  filter(Region==input$x1)
+      selectizeInput(inputId = "incomeGR", label = "Select Incrome Group", choices = Data6$IncomeGroup)    
+    }
   })
   
   output$CON.Name <- renderUI({
+    if (length(input$x1)==0 & length(input$incomeGR)==0) return()
+    else {
     Data7 <- Data3 %>%  filter(Region==input$x1) %>% filter(IncomeGroup==input$incomeGR)    
-    selectizeInput(inputId="conname", label="Select Country Name", choices = Data7$Country.Name)         
+    selectizeInput(inputId="conname", label="Select Country Name", choices = Data7$Country.Name)  }      
   })
   
   output$Time.Year <- renderUI({
+    if (length(input$x1)==0 & length(input$incomeGR) & length(input$conname)) return() 
+    else{
     Data8 <- Data3 %>% filter(Region==input$x1) %>% filter(IncomeGroup==input$incomeGR & Country.Name==input$conname) 
-    selectizeInput(inputId="time", label='Select Year', choices = Data8$Year)
+    selectizeInput(inputId="time", label='Select Year', choices = Data8$Year)}
   })
   selectedData2 <- reactive({
     Data8<-Data_Test3[Data_Test3$Region==input$x1,]
